@@ -1,7 +1,7 @@
 # alexaGPT
 
 Just some snippets for an Alexa skill which connects to OpenAI GPT API
-I implemented a simple memory function (stores the last 20 conversations) and should remember all things in one session.
+I implemented a simple memory function (stores the last 20 conversations) and should remember these. Just up the value if you like in the add_message_to_history function.
 
 ## How to setup
 Just go to developer.amazon.com -> Alexa and build a skill from scratch and use the python environment. 
