@@ -25,11 +25,7 @@
                 },
                 {
                     "name": "AMAZON.StopIntent",
-                    "samples": [
-                        "Beenden",
-                        "Beende dich",
-                        "Stop"
-                    ]
+                    "samples": []
                 },
                 {
                     "name": "AMAZON.NavigateHomeIntent",
