@@ -25,6 +25,10 @@ class LaunchRequestHandler(AbstractRequestHandler):
 
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
+        
+        #clear history
+        HISTORY=[]
+
         speak_output = "Alpha modus gestartet. Ich bin Ava"
 
         return (

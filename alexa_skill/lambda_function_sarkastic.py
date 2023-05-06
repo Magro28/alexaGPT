@@ -25,6 +25,10 @@ class LaunchRequestHandler(AbstractRequestHandler):
 
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
+
+        #clear history
+        HISTORY=[]
+        
         speak_output = "Omega modus gestartet. Ich bin Drakonia"
 
         return (
