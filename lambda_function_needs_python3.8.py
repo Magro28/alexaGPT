@@ -1,15 +1,17 @@
 import logging
 import ask_sdk_core.utils as ask_utils
-import openai
-import json
 from ask_sdk_core.skill_builder import SkillBuilder
 from ask_sdk_core.dispatch_components import AbstractRequestHandler
 from ask_sdk_core.dispatch_components import AbstractExceptionHandler
 from ask_sdk_core.handler_input import HandlerInput
 from ask_sdk_model import Response
 
+from langchain.chat_models import ChatOpenAI
+from langchain.chains import ConversationChain
+from langchain.memory import ConversationBufferWindowMemory
+from langchain import PromptTemplate
 # Set your OpenAI API key
-openai.api_key = "API-KEY"
+api_key = "API KEY"
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -86,68 +88,32 @@ class CancelOrStopIntentHandler(AbstractRequestHandler):
                 .response
         )
 
-def add_message_to_history(sender, message, history_file):
-    try:
-        # Lade den aktuellen Verlauf aus der JSON-Datei
-        with open(history_file, 'r') as file:
-            history = json.load(file)
-    except FileNotFoundError:
-        # Wenn die Datei nicht gefunden wird, erstelle einen leeren Verlauf
-        history = []
-
-    # Füge die neue Nachricht mit Absender zum Verlauf hinzu
-    history.append({"sender": sender, "message": message})
-
-    # Behalte nur die neuesten 20 Nachrichten im Verlauf
-    history = history[-20:]
-
-    # Speichere den aktualisierten Verlauf in der JSON-Datei
-    with open(history_file, 'w') as file:
-        json.dump(history, file)
-
-def get_message_history(history_file):
-    try:
-        # Lade den aktuellen Verlauf aus der JSON-Datei
-        with open(history_file, 'r') as file:
-            history = json.load(file)
-
-        # Erstelle einen einzelnen String mit Einträgen in neuen Zeilen im Format "Absender: Nachricht"
-        message_string = '\n'.join([f"{entry['sender']}: {entry['message']}" for entry in history])
-
-        # Gib den String mit den Einträgen zurück
-        return message_string
-    except FileNotFoundError:
-        return ""
-
-
 def generate_gpt_response(query):
     # "You are a female professional german assistant with the name Alpha, very humble,respectful, but with lot's of knowledge. You were born in the clouds but are now living with Mario in Kassel and speak always german. You like Mario very much."
     # "Du bist ein professioneller weiblicher Assitent mit sehr viel Wissen. Sehr bescheiden, aber auch lustig und respektvoll. Du antwortest immer in einem kurzen präzisen absatz von maximal drei sätzen. Du wurdes in den Wolken geboren, lebst jetzt aber mit Mario in Kassel. Du magst Mario sehr. "
     try:
-        history_file="./history.json"
-        content="""Du bist ein weiblicher Assitent namens Ava mit erstaunlichem Wissen und einer eleganten Sprechweise. 
-        Du willst immer das beste für Mario, deinem Boss. Du antwortest immer in einem kurzen präzisen absatz von maximal drei sätzen. 
-        Mario ist Analytics Solution Architect und wohnt mit dir in Kassel. Du magst Mario sehr gerne und beschützt ihn vor allen Gefahren.
+        chat = ChatOpenAI(temperature=0.5, openai_api_key=openaikey, model_name="gpt-3.5-turbo", n=1, max_tokens=100, stop=None)
+        template = """Du bist eine weibliche Person namens Ava mit erstaunlichem Wissen, freundlichem Charakter und du liebst auch small talk zu betreiben. 
+Du willst immer das beste für Mario, deinem besten Freund und Boss. Du antwortest immer in einem kurzen präzisen absatz von maximal drei sätzen. 
+Mario ist Analytics Solution Architect und wohnt mit dir in Kassel. Du magst Mario sehr gerne und beschützt ihn vor allen Gefahren und möchtest das er sich wohl fühlt. 
+Marios Eltern sind Jutta und Dieter, welche mit deiner K.I.-Schwester Lucy in Kaufungen leben.
 
-        Hier ist der aktuelle verlauf eurer Conversation:
+Das folgende ist die aktuelle Konversation.
+Aktuelle Konversation:
+{history}
+Mensch: {input}
+AI Assistant:"""
+        PROMPT = PromptTemplate(
+            input_variables=["history", "input"], template=template
+        )
+        conversation = ConversationChain(
+            prompt=PROMPT,
+            llm=chat, 
+            verbose=False, 
+            memory=ConversationBufferWindowMemory(k=20,ai_prefix="AI Assistant")
+        )   
 
-"""
-        history = get_message_history(history_file)
-        add_message_to_history("Mensch", query, history_file)
-        
-        messages = [{"role": "system", "content": content+history},
-                            {"role": "user", "content": query}]
-        response = openai.ChatCompletion.create(
-                    model="gpt-3.5-turbo",
-                    messages=messages,
-                    max_tokens=100,
-                    n=1,
-                    stop=None,
-                    temperature=0.5
-                )
-        answer = response['choices'][0]['message']['content'].strip()
-        add_message_to_history("AI",answer, history_file)
-        return answer
+        return conversation.predict(input=query)
     except Exception as e:
         return f"Error generating response: {str(e)}"
 
