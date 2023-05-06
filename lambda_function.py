@@ -125,7 +125,7 @@ AI Assistant:"""
             memory=ConversationBufferWindowMemory(k=20,ai_prefix="AI Assistant")
         )   
 
-        return conversation.predict(input=query).content
+        return conversation.predict(input=query)
     except Exception as e:
         return f"Error generating response: {str(e)}"
 
