@@ -105,6 +105,11 @@ def get_message_history(history):
     # Gib den String mit den Einträgen zurück
     return message_string
 
+def remove_prefix(string, prefix):
+    if string.startswith(prefix):
+        return string[len(prefix):]
+    return string
+
 def generate_gpt_response(query):
     try:
 
@@ -129,7 +134,10 @@ def generate_gpt_response(query):
                     temperature=0.5
                 )
         answer = response['choices'][0]['message']['content'].strip()
+        answer = remove_prefix(answer, "Drakonia: ")
+        answer = remove_prefix(answer, "K.I.: ")
         add_message_to_history("K.I.",answer, HISTORY)
+
         return answer
     except Exception as e:
         return f"Error generating response: {str(e)}"
