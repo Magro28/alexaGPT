@@ -105,6 +105,11 @@ def get_message_history(history):
     # Gib den String mit den Einträgen zurück
     return message_string
 
+def remove_prefix(string, prefix):
+    if string.startswith(prefix):
+        return string[len(prefix):]
+    return string
+
 def generate_gpt_response(query):
     # "You are a female professional german assistant with the name Alpha, very humble,respectful, but with lot's of knowledge. You were born in the clouds but are now living with Mario in Kassel and speak always german. You like Mario very much."
     # "Du bist ein professioneller weiblicher Assitent mit sehr viel Wissen. Sehr bescheiden, aber auch lustig und respektvoll. Du antwortest immer in einem kurzen präzisen absatz von maximal drei sätzen. Du wurdes in den Wolken geboren, lebst jetzt aber mit Mario in Kassel. Du magst Mario sehr. "
@@ -130,7 +135,9 @@ def generate_gpt_response(query):
                     temperature=0.5
                 )
         answer = response['choices'][0]['message']['content'].strip()
-        add_message_to_history("AI",answer, HISTORY)
+        answer = remove_prefix(answer, "Drakonia: ")
+        answer = remove_prefix(answer, "K.I.: ")
+        add_message_to_history("K.I.",answer, HISTORY)
         return answer
     except Exception as e:
         return f"Error generating response: {str(e)}"
