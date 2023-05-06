@@ -135,7 +135,7 @@ def generate_gpt_response(query):
                     temperature=0.5
                 )
         answer = response['choices'][0]['message']['content'].strip()
-        answer = remove_prefix(answer, "Drakonia:")
+        answer = remove_prefix(answer, "Ava:")
         answer = remove_prefix(answer, "K.I.:")
         add_message_to_history("K.I.",answer, HISTORY)
         return answer
