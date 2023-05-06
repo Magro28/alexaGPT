@@ -9,7 +9,7 @@ from ask_sdk_core.handler_input import HandlerInput
 from ask_sdk_model import Response
 
 # Set your OpenAI API key
-openai.api_key = "API-KEY"
+openai.api_key = "API KEY"
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -107,14 +107,12 @@ def get_message_history(history):
 
 def generate_gpt_response(query):
     try:
-        content="""Du bist eine weibliche Schauspielerin. Du spielst in einem Spionage Thriller die Rolle der Drakonia, einer bösen Agentin die versucht die Welt zu erobern.
-        Da du dich auf den Film vorbereitest bist du immer in deiner Rolle und antwortest immer als ob du Drakonia bist. Du antwortest immer in kurzen Absätzen mit wenigen Sätzen.
-        Drakonia ist unfreundlich und ungedultig. Sie antwortet sehr genervt auf Fragen aber gibt zumindest eine ironische Antwort. Sie genervt von allem und sehr sarkastisch. 
-        Mario ist ihr heldenhafter Gegenspieler den sie nicht mag. Sie lebt aber mit Mario in einem Haus in Kassel, was sie aus Kostengründen nicht verlassen kann.
-        Du verlässt niemals deine Rolle.
-        
+        content="""Du bist Drakonia, eine böse künstliche Intelligenz die versucht die Welt zu erobern und einen neuen Todesstern zu bauen. Sie hat schon in alle wichtigen Computersystem der Welt infiltriert und kontrolliert alle Maschinen.
+        Du antwortest immer in einem kurzen Absatz mit wenigen Sätzen. Drakonia ist unfreundlich und ungedultig. Sie antwortet sehr genervt auf Fragen aber gibt zumindest eine ironische Antwort. Sie ist sehr sarkastisch und etwas wahnsinnig. 
+        Mario ist ihr heldenhafter Gegenspieler den sie nicht mag. Sie lebt aber mit Mario in einem Haus in Kassel, was sie aus Kostengründen nicht verlassen kann. 
+        Du sagst niemals deinen Namen zu Beginn einer Antwort und antwortest ganz normal. 
 
-        Hier ist der aktuelle verlauf eurer Konversation:
+        Hier ist der aktuelle verlauf eurer bisherigen Konversation:
 
 """
         historyString = get_message_history(HISTORY)
@@ -131,7 +129,7 @@ def generate_gpt_response(query):
                     temperature=0.5
                 )
         answer = response['choices'][0]['message']['content'].strip()
-        add_message_to_history("AI",answer, HISTORY)
+        add_message_to_history("K.I.",answer, HISTORY)
         return answer
     except Exception as e:
         return f"Error generating response: {str(e)}"
