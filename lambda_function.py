@@ -1,14 +1,28 @@
 import logging
 import ask_sdk_core.utils as ask_utils
-import openai
 from ask_sdk_core.skill_builder import SkillBuilder
 from ask_sdk_core.dispatch_components import AbstractRequestHandler
 from ask_sdk_core.dispatch_components import AbstractExceptionHandler
 from ask_sdk_core.handler_input import HandlerInput
 from ask_sdk_model import Response
 
+from langchain.chat_models import ChatOpenAI
+from langchain.chains import ConversationChain
+from langchain.memory import ConversationBufferWindowMemory
+from langchain.prompts.chat import (
+    ChatPromptTemplate,
+    SystemMessagePromptTemplate,
+    AIMessagePromptTemplate,
+    HumanMessagePromptTemplate,
+)
+from langchain.schema import (
+    AIMessage,
+    HumanMessage,
+    SystemMessage
+)
+
 # Set your OpenAI API key
-openai.api_key = "API KEY"
+api_key = "API KEY"
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -89,20 +103,16 @@ def generate_gpt_response(query):
     # "You are a female professional german assistant with the name Alpha, very humble,respectful, but with lot's of knowledge. You were born in the clouds but are now living with Mario in Kassel and speak always german. You like Mario very much."
     # "Du bist ein professioneller weiblicher Assitent mit sehr viel Wissen. Sehr bescheiden, aber auch lustig und respektvoll. Du antwortest immer in einem kurzen präzisen absatz von maximal drei sätzen. Du wurdes in den Wolken geboren, lebst jetzt aber mit Mario in Kassel. Du magst Mario sehr. "
     try:
-        messages = [{"role": "system", "content": """Du bist ein weiblicher Assitent namens Ava mit erstaunlichem Wissen und einer eleganten Sprechweise. 
-        Du willst immer das beste für Mario, deinem Boss. Du antwortest immer in einem kurzen präzisen absatz von maximal drei sätzen. 
+        chat = ChatOpenAI(temperature=0.5, openai_api_key=openaikey, model_name="gpt-3.5-turbo", n=1, max_tokens=100, stop=None)
+        messages = [SystemMessage(content= """Du bist ein weiblicher Assitent namens Ava mit erstaunlichem Wissen und einer eleganten Sprechweise. 
+        Du willst immer das beste für Mario, deinem Boss. Du duzt alle. Du antwortest immer in einem kurzen präzisen absatz von maximal drei sätzen. 
         Mario ist Analytics Solution Architect und wohnt mit dir in Kassel. Du magst Mario sehr gerne und beschützt ihn vor allen Gefahren.
-        """},
-                    {"role": "user", "content": query}]
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=messages,
-            max_tokens=100,
-            n=1,
-            stop=None,
-            temperature=0.5
+        """)]
+        conversation_with_summary = ConversationChain(
+        llm=chat, 
+        memory=ConversationBufferWindowMemory(k=10),
         )
-        return response['choices'][0]['message']['content'].strip()
+        return conversation_with_summary.predict(input=query)
     except Exception as e:
         return f"Error generating response: {str(e)}"
 
