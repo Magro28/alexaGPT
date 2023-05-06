@@ -8,7 +8,15 @@ I implemented a simple memory function (stores the last 20 conversations) and sh
 
 Just go to developer.amazon.com -> Alexa and build a skill from scratch and use the python environment. Choose the right locale. 
 #### Build section
-Set the invocation name and the intents in the json file. Build the model.
+
+##### Invocations
+Set the invocation name 
+
+##### Interaction Model
+###### Json File
+Change the intents and invocation name in the intents.json file and put the json file there. 
+
+Build the model.
 
 #### Code section
 Replace in the code section the lambda_function.py and requirement.txt.
