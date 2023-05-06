@@ -14,6 +14,8 @@ openai.api_key = "API-KEY"
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
+HISTORY=[]
+
 class LaunchRequestHandler(AbstractRequestHandler):
     """Handler for Skill Launch."""
     def can_handle(self, handler_input):
@@ -86,45 +88,27 @@ class CancelOrStopIntentHandler(AbstractRequestHandler):
                 .response
         )
 
-def add_message_to_history(sender, message, history_file):
-    try:
-        # Lade den aktuellen Verlauf aus der JSON-Datei
-        with open(history_file, 'r') as file:
-            history = json.load(file)
-    except FileNotFoundError:
-        # Wenn die Datei nicht gefunden wird, erstelle einen leeren Verlauf
-        history = []
-
+def add_message_to_history(sender, message, history):
     # Füge die neue Nachricht mit Absender zum Verlauf hinzu
     history.append({"sender": sender, "message": message})
 
     # Behalte nur die neuesten 20 Nachrichten im Verlauf
     history = history[-20:]
 
-    # Speichere den aktualisierten Verlauf in der JSON-Datei
-    with open(history_file, 'w') as file:
-        json.dump(history, file)
+    # Gib den aktualisierten Verlauf zurück
+    return history
 
-def get_message_history(history_file):
-    try:
-        # Lade den aktuellen Verlauf aus der JSON-Datei
-        with open(history_file, 'r') as file:
-            history = json.load(file)
+def get_message_history(history):
+    # Erstelle einen einzelnen String mit Einträgen in neuen Zeilen im Format "Absender: Nachricht"
+    message_string = '\n'.join([f"{entry['sender']}: {entry['message']}" for entry in history])
 
-        # Erstelle einen einzelnen String mit Einträgen in neuen Zeilen im Format "Absender: Nachricht"
-        message_string = '\n'.join([f"{entry['sender']}: {entry['message']}" for entry in history])
-
-        # Gib den String mit den Einträgen zurück
-        return message_string
-    except FileNotFoundError:
-        return ""
-
+    # Gib den String mit den Einträgen zurück
+    return message_string
 
 def generate_gpt_response(query):
     # "You are a female professional german assistant with the name Alpha, very humble,respectful, but with lot's of knowledge. You were born in the clouds but are now living with Mario in Kassel and speak always german. You like Mario very much."
     # "Du bist ein professioneller weiblicher Assitent mit sehr viel Wissen. Sehr bescheiden, aber auch lustig und respektvoll. Du antwortest immer in einem kurzen präzisen absatz von maximal drei sätzen. Du wurdes in den Wolken geboren, lebst jetzt aber mit Mario in Kassel. Du magst Mario sehr. "
     try:
-        history_file="./history.json"
         content="""Du bist ein weiblicher Assitent namens Ava mit erstaunlichem Wissen und einer eleganten Sprechweise. 
         Du willst immer das beste für Mario, deinem Boss. Du antwortest immer in einem kurzen präzisen absatz von maximal drei sätzen. 
         Mario ist Analytics Solution Architect und wohnt mit dir in Kassel. Du magst Mario sehr gerne und beschützt ihn vor allen Gefahren.
@@ -132,10 +116,10 @@ def generate_gpt_response(query):
         Hier ist der aktuelle verlauf eurer Conversation:
 
 """
-        history = get_message_history(history_file)
-        add_message_to_history("Mensch", query, history_file)
+        historyString = get_message_history(HISTORY)
+        add_message_to_history("Mensch", query, HISTORY)
         
-        messages = [{"role": "system", "content": content+history},
+        messages = [{"role": "system", "content": content+historyString},
                             {"role": "user", "content": query}]
         response = openai.ChatCompletion.create(
                     model="gpt-3.5-turbo",
@@ -146,7 +130,7 @@ def generate_gpt_response(query):
                     temperature=0.5
                 )
         answer = response['choices'][0]['message']['content'].strip()
-        add_message_to_history("AI",answer, history_file)
+        add_message_to_history("AI",answer, HISTORY)
         return answer
     except Exception as e:
         return f"Error generating response: {str(e)}"
