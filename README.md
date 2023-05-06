@@ -28,3 +28,8 @@ Deploy the code.
 #### Test section
 In the "Test" tab set skill testing to "development". It should now run on your Alexa device.
 
+## Limitations
+The Alexa API limits long responses. So keep the max_token parameter low and instruct GPT to respond in short sentences. Longer responses can be continued by saying "continue" or "fortsetzen". 
+
+Sometimes there are still some crashes which wipe out the memory. 
+
