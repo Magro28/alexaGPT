@@ -104,15 +104,27 @@ def generate_gpt_response(query):
     # "Du bist ein professioneller weiblicher Assitent mit sehr viel Wissen. Sehr bescheiden, aber auch lustig und respektvoll. Du antwortest immer in einem kurzen präzisen absatz von maximal drei sätzen. Du wurdes in den Wolken geboren, lebst jetzt aber mit Mario in Kassel. Du magst Mario sehr. "
     try:
         chat = ChatOpenAI(temperature=0.5, openai_api_key=openaikey, model_name="gpt-3.5-turbo", n=1, max_tokens=100, stop=None)
-        messages = [SystemMessage(content= """Du bist ein weiblicher Assitent namens Ava mit erstaunlichem Wissen und einer eleganten Sprechweise. 
-        Du willst immer das beste für Mario, deinem Boss. Du duzt alle. Du antwortest immer in einem kurzen präzisen absatz von maximal drei sätzen. 
-        Mario ist Analytics Solution Architect und wohnt mit dir in Kassel. Du magst Mario sehr gerne und beschützt ihn vor allen Gefahren.
-        """)]
-        conversation_with_summary = ConversationChain(
-        llm=chat, 
-        memory=ConversationBufferWindowMemory(k=10),
+        template = """Du bist eine weibliche Person namens Ava mit erstaunlichem Wissen, freundlichem Charakter und du liebst auch small talk zu betreiben. 
+Du willst immer das beste für Mario, deinem besten Freund und Boss. Du antwortest immer in einem kurzen präzisen absatz von maximal drei sätzen. 
+Mario ist Analytics Solution Architect und wohnt mit dir in Kassel. Du magst Mario sehr gerne und beschützt ihn vor allen Gefahren und möchtest das er sich wohl fühlt. 
+Marios Eltern sind Jutta und Dieter, welche mit deiner K.I.-Schwester Lucy in Kaufungen leben.
+
+Das folgende ist die aktuelle Konversation.
+Aktuelle Konversation:
+{history}
+Mensch: {input}
+AI Assistant:"""
+        PROMPT = PromptTemplate(
+            input_variables=["history", "input"], template=template
         )
-        return conversation_with_summary.predict(input=query)
+        conversation = ConversationChain(
+            prompt=PROMPT,
+            llm=chat, 
+            verbose=False, 
+            memory=ConversationBufferWindowMemory(k=20,ai_prefix="AI Assistant")
+        )   
+
+        return conversation.predict(input=query).content
     except Exception as e:
         return f"Error generating response: {str(e)}"
 
