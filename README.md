@@ -2,7 +2,7 @@
 
 Just some snippets for an Alexa skill which connects to OpenAI GPT API
 
-I implemented a simple memory function (stores the last 20 conversations) and should remember these until the lambda function restarts. Just up the value if you like in the add_message_to_history function.
+I implemented a simple memory function (stores the last 20 conversations) and should remember these until the skill is started again. Just up the value if you like in the add_message_to_history function.
 
 ## How to setup
 
