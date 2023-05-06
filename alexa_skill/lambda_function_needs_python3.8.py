@@ -10,6 +10,9 @@ from langchain.chat_models import ChatOpenAI
 from langchain.chains import ConversationChain
 from langchain.memory import ConversationBufferWindowMemory
 from langchain import PromptTemplate
+
+"""This lambda function does not work on the alexa hosted lamdba functions. So use the other one"""
+
 # Set your OpenAI API key
 api_key = "API KEY"
 
