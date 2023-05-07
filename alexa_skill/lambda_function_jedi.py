@@ -29,7 +29,7 @@ class LaunchRequestHandler(AbstractRequestHandler):
         #clear history
         HISTORY=[]
 
-        speak_output = "Omega modus gestartet. Jodali ich bin."
+        speak_output = "Jedi modus gestartet. Jodali ich bin."
 
         return (
             handler_input.response_builder
@@ -84,7 +84,7 @@ class CancelOrStopIntentHandler(AbstractRequestHandler):
 
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
-        speak_output = "Beende omega modus"
+        speak_output = "Beende jedi modus"
 
         return (
             handler_input.response_builder
