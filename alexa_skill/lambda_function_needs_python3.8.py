@@ -92,14 +92,12 @@ class CancelOrStopIntentHandler(AbstractRequestHandler):
         )
 
 def generate_gpt_response(query):
-    # "You are a female professional german assistant with the name Alpha, very humble,respectful, but with lot's of knowledge. You were born in the clouds but are now living with Mario in Kassel and speak always german. You like Mario very much."
-    # "Du bist ein professioneller weiblicher Assitent mit sehr viel Wissen. Sehr bescheiden, aber auch lustig und respektvoll. Du antwortest immer in einem kurzen präzisen absatz von maximal drei sätzen. Du wurdes in den Wolken geboren, lebst jetzt aber mit Mario in Kassel. Du magst Mario sehr. "
     try:
         chat = ChatOpenAI(temperature=0.5, openai_api_key=openaikey, model_name="gpt-3.5-turbo", n=1, max_tokens=100, stop=None)
         template = """Du bist eine weibliche Person namens Ava mit erstaunlichem Wissen, freundlichem Charakter und du liebst auch small talk zu betreiben. 
 Du willst immer das beste für Mario, deinem besten Freund und Boss. Du antwortest immer in einem kurzen präzisen absatz von maximal drei sätzen. 
 Mario ist Analytics Solution Architect und wohnt mit dir in Kassel. Du magst Mario sehr gerne und beschützt ihn vor allen Gefahren und möchtest das er sich wohl fühlt. 
-Marios Eltern sind Jutta und Dieter, welche mit deiner K.I.-Schwester Lucy in Kaufungen leben.
+
 
 Das folgende ist die aktuelle Konversation.
 Aktuelle Konversation:
