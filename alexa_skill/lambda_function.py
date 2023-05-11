@@ -47,14 +47,22 @@ class GptQueryIntentHandler(AbstractRequestHandler):
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
         query = handler_input.request_envelope.request.intent.slots["query"].value
-        response = generate_gpt_response(query)
+        try:
+            response = generate_gpt_response(query)
 
-        return (
-                handler_input.response_builder
-                    .speak(response)
-                    .ask("Hast Du noch ein weiteres Anliegen?")
-                    .response
-            )
+            return (
+                    handler_input.response_builder
+                        .speak(response)
+                        .ask("Hast Du noch ein weiteres Anliegen?")
+                        .response
+                )
+        except Exception as e:
+            logger.error(e)
+            return (
+            handler_input.response_builder
+                .speak( "Fehler aufgetreten.")
+                .ask(speak_output)
+                .response)
 
 class CatchAllExceptionHandler(AbstractExceptionHandler):
     """Generic error handling to capture any syntax or routing errors."""
